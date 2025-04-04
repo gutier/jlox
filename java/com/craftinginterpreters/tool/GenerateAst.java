@@ -21,6 +21,8 @@ public class GenerateAst {
             "Logical  : Expr left, Token operator, Expr right",
             "Unary    : Token operator, Expr right",
             "Call     : Expr callee, Token paren, List<Expr> arguments",
+            "Get      : Expr object, Token name",
+            "Set      : Expr object, Token name, Expr value",
             "Variable : Token name"
         ));
 
@@ -28,6 +30,7 @@ public class GenerateAst {
         "Expression : Expr expression",
         "Function   : Token name, List<Token> params," +
                     " List<Stmt> body",
+        "Class      : Token name, List<Stmt.Function> methods",
         "If         : Expr condition, Stmt thenBranch," +
                     " Stmt elseBranch",
         "Print      : Expr expression",

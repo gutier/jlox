@@ -48,6 +48,16 @@ class AstPrinter implements Expr.Visitor<String> {
         return parenthesize("call", expr.callee);
     }
 
+    @Override //TODO
+    public String visitGetExpr(Expr.Get expr) {
+        return parenthesize(".", expr);
+    }
+
+    @Override //TODO
+    public String visitSetExpr(Expr.Set expr) {
+        return parenthesize("=", expr);
+    }
+
     private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 
