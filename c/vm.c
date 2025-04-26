@@ -190,10 +190,6 @@ static InterpretResult run() {
         printf("\n");
         break;
       }
-      case OP_RETURN: {
-        // Exit interpreter
-        return INTERPRET_OK;
-      }
       case OP_JUMP: {
         uint16_t offset = READ_SHORT();
         vm.ip += offset;
@@ -203,6 +199,15 @@ static InterpretResult run() {
         uint16_t offset = READ_SHORT();
         if (isFalsey(peek(0))) vm.ip += offset;
         break;
+      }
+      case OP_LOOP: {
+        uint16_t offset = READ_SHORT();
+        vm.ip -= offset;
+        break;
+      }
+      case OP_RETURN: {
+        // Exit interpreter
+        return INTERPRET_OK;
       }
     }
   }
