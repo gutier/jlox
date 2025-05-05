@@ -423,6 +423,21 @@ static void variable(bool canAssign) {
   namedVariable(parser.previous, canAssign);
 }
 
+static uint8_t argumentList() {
+  uint8_t argCount = 0;
+  if (!check(TOKEN_RIGHT_PAREN)) {
+    do {
+      expression();
+      if (argCount == 255) {
+        error("Can't have more than 255 arguments.");
+      }
+      argCount++;
+    } while (match(TOKEN_COMMA));
+  }
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
+  return argCount;
+}
+
 static Token syntheticToken(const char* text) {
   Token token;
   token.start = text;
@@ -442,8 +457,15 @@ static void super_(bool canAssign) {
   uint8_t name = identifierConstant(&parser.previous);
 
   namedVariable(syntheticToken("this"), false);
-  namedVariable(syntheticToken("super"), false);
-  emitBytes(OP_GET_SUPER, name);
+  if (match(TOKEN_LEFT_PAREN)) {
+    uint8_t argCount = argumentList();
+    namedVariable(syntheticToken("super"), false);
+    emitBytes(OP_SUPER_INVOKE, name);
+    emitByte(argCount);
+  } else {
+    namedVariable(syntheticToken("super"), false);
+    emitBytes(OP_GET_SUPER, name);
+  }
 }
 
 static void this_(bool canAssign) {
@@ -487,21 +509,6 @@ static void binary(bool canAssign) {
     case TOKEN_SLASH:         emitByte(OP_DIVIDE); break;
     default: return; // Unreachable.
   }
-}
-
-static uint8_t argumentList() {
-  uint8_t argCount = 0;
-  if (!check(TOKEN_RIGHT_PAREN)) {
-    do {
-      expression();
-      if (argCount == 255) {
-        error("Can't have more than 255 arguments.");
-      }
-      argCount++;
-    } while (match(TOKEN_COMMA));
-  }
-  consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
-  return argCount;
 }
 
 static void call(bool canAssign) {
